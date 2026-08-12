@@ -110,6 +110,8 @@ go-algorithm/
 - [x] 反射 — 字段遍历、struct tag、动态调用 (`advanced.FieldValues` / `advanced.CallMethod`)
 
 ### Go 标准库应用 (stdlib)
+> 标准库包的系统介绍与用法见 [`stdlib/README.md`](stdlib/README.md)
+
 - [x] net/http — 路由、JSON 接口、HTTP 客户端 (`stdlib.NewMux` / `stdlib.GetJSON`)
 - [x] encoding/json — 序列化、字段 tag、自定义编解码 (`stdlib.MarshalUser` / `stdlib.ToJSON`)
 - [x] io/bufio — 按行读取、缓冲写入 (`stdlib.NewLineReader` / `stdlib.WriteLines`)
@@ -148,7 +150,7 @@ go-algorithm/
 go test ./...
 ```
 
-## 运演示
+## 运行演示
 
 ```bash
 go run main.go

@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -11,6 +12,7 @@ import (
 	"time"
 
 	"algorithm-go/advanced"
+	"algorithm-go/array"
 	"algorithm-go/bloomfilter"
 	"algorithm-go/corealgo"
 	"algorithm-go/graph"
@@ -33,107 +35,130 @@ func main() {
 	fmt.Println("=== Go 数据结构实现演示 ===")
 	fmt.Println()
 
-	// 1. 单向链表演示
-	fmt.Println("1. 单向链表 (Singly Linked List)")
+	// 1. 动态数组演示
+	fmt.Println("1. 动态数组 (Dynamic Array)")
+	demoArray()
+	fmt.Println()
+
+	// 2. 单向链表演示
+	fmt.Println("2. 单向链表 (Singly Linked List)")
 	demoSinglyLinkedList()
 	fmt.Println()
 
-	// 2. 双向链表演示
-	fmt.Println("2. 双向链表 (Doubly Linked List)")
+	// 3. 双向链表演示
+	fmt.Println("3. 双向链表 (Doubly Linked List)")
 	demoDoublyLinkedList()
 	fmt.Println()
 
-	// 3. 栈演示
-	fmt.Println("3. 栈 (Stack)")
+	// 4. 栈演示
+	fmt.Println("4. 栈 (Stack)")
 	demoStack()
 	fmt.Println()
 
-	// 4. 队列演示
-	fmt.Println("4. 队列 (Queue)")
+	// 5. 队列演示
+	fmt.Println("5. 队列 (Queue)")
 	demoQueue()
 	fmt.Println()
 
-	// 5. 二叉搜索树演示
-	fmt.Println("5. 二叉搜索树 (Binary Search Tree)")
+	// 6. 二叉搜索树演示
+	fmt.Println("6. 二叉搜索树 (Binary Search Tree)")
 	demoBST()
 	fmt.Println()
 
-	// 6. AVL树演示
-	fmt.Println("6. AVL树 (AVL Tree)")
+	// 7. AVL树演示
+	fmt.Println("7. AVL树 (AVL Tree)")
 	demoAVLTree()
 	fmt.Println()
 
-	// 7. 红黑树演示
-	fmt.Println("7. 红黑树 (Red-Black Tree)")
+	// 8. 红黑树演示
+	fmt.Println("8. 红黑树 (Red-Black Tree)")
 	demoRedBlackTree()
 	fmt.Println()
 
-	// 8. B树演示
-	fmt.Println("8. B树 (B-Tree)")
+	// 9. B树演示
+	fmt.Println("9. B树 (B-Tree)")
 	demoBTree()
 	fmt.Println()
 
-	// 9. 哈希表演示
-	fmt.Println("9. 哈希表 (Hash Table)")
+	// 10. 哈希表演示
+	fmt.Println("10. 哈希表 (Hash Table)")
 	demoHashTable()
 	fmt.Println()
 
-	// 10. 堆演示
-	fmt.Println("10. 堆 (Heap)")
+	// 11. 堆演示
+	fmt.Println("11. 堆 (Heap)")
 	demoHeap()
 	fmt.Println()
 
-	// 11. 图演示
-	fmt.Println("11. 图 (Graph)")
+	// 12. 图演示
+	fmt.Println("12. 图 (Graph)")
 	demoGraph()
 	fmt.Println()
 
-	// 12. 字典树演示
-	fmt.Println("12. 字典树 (Trie)")
+	// 13. 字典树演示
+	fmt.Println("13. 字典树 (Trie)")
 	demoTrie()
 	fmt.Println()
 
-	// 13. 并查集演示
-	fmt.Println("13. 并查集 (Union-Find)")
+	// 14. 并查集演示
+	fmt.Println("14. 并查集 (Union-Find)")
 	demoUnionFind()
 	fmt.Println()
 
-	// 14. 布隆过滤器演示
-	fmt.Println("14. 布隆过滤器 (Bloom Filter)")
+	// 15. 布隆过滤器演示
+	fmt.Println("15. 布隆过滤器 (Bloom Filter)")
 	demoBloomFilter()
 	fmt.Println()
 
-	// 15. 排序算法演示
-	fmt.Println("15. 排序算法 (Sort)")
+	// 16. 排序算法演示
+	fmt.Println("16. 排序算法 (Sort)")
 	demoSort()
 	fmt.Println()
 
-	// 16. 搜索算法演示
-	fmt.Println("16. 搜索算法 (Search)")
+	// 17. 搜索算法演示
+	fmt.Println("17. 搜索算法 (Search)")
 	demoSearch()
 	fmt.Println()
 
-	// 17. Go 高级用法演示
-	fmt.Println("17. Go 高级用法 (Advanced)")
+	// 18. Go 高级用法演示
+	fmt.Println("18. Go 高级用法 (Advanced)")
 	demoAdvanced()
 	fmt.Println()
 
-	// 18. 标准库应用演示
-	fmt.Println("18. Go 标准库应用 (Stdlib)")
+	// 19. 标准库应用演示
+	fmt.Println("19. Go 标准库应用 (Stdlib)")
 	demoStdlib()
 	fmt.Println()
 
-	// 19. 知名第三方库应用演示
-	fmt.Println("19. Go 知名第三方库应用 (Thirdparty)")
+	// 20. 知名第三方库应用演示
+	fmt.Println("20. Go 知名第三方库应用 (Thirdparty)")
 	demoThirdparty()
 	fmt.Println()
 
-	// 20. 核心算法演示
-	fmt.Println("20. Go 核心算法 (CoreAlgo)")
+	// 21. 核心算法演示
+	fmt.Println("21. Go 核心算法 (CoreAlgo)")
 	demoCoreAlgo()
 	fmt.Println()
 
 	fmt.Println("=== 演示完成 ===")
+}
+
+// demoArray 演示动态数组
+func demoArray() {
+	arr := array.NewDynamicArray(4)
+
+	arr.Add(1)
+	arr.Add(2)
+	arr.Add(3)
+	arr.Insert(1, 99)
+	fmt.Printf("  数组内容: %s\n", arr.String())
+
+	v, _ := arr.Get(1)
+	fmt.Printf("  索引1的元素: %v\n", v)
+
+	removed, _ := arr.Remove(2)
+	fmt.Printf("  删除索引2的元素(%v)后: %v\n", removed, arr.ToSlice())
+	fmt.Printf("  大小: %d, 容量: %d\n", arr.Size(), arr.Capacity())
 }
 
 // demoSinglyLinkedList 演示单向链表
@@ -539,6 +564,38 @@ func demoAdvanced() {
 	calc := advanced.NewCalculator(10)
 	callResults, _ := advanced.CallMethod(calc, "Add", 5)
 	fmt.Printf("  反射调用 Calculator.Add(5): %v\n", callResults[0])
+
+	// goroutine 并行转换
+	squares := advanced.ParallelMap([]int{1, 2, 3, 4, 5}, func(n int) int { return n * n }, 3)
+	fmt.Printf("  并行转换平方: %v\n", squares)
+
+	// 有缓冲 channel
+	fmt.Printf("  有缓冲 channel: %v\n", advanced.ConsumeAll(advanced.BufferedProduce([]int{1, 2, 3}, 2)))
+
+	// RWMutex 缓存
+	cache := advanced.NewRWCache()
+	cache.Set("name", "Alice")
+	name, _ := cache.Get("name")
+	fmt.Printf("  读写锁缓存: name=%s, size=%d\n", name, cache.Size())
+
+	// sync.Once 单例
+	fmt.Printf("  sync.Once 单例: %s\n", advanced.GetInstance().Name())
+
+	// context 取消传播
+	fmt.Printf("  context 取消传播: %v\n", advanced.CancelPropagation())
+
+	// panic 边界恢复
+	recoveredErr := advanced.CallWithRecover(func() { panic("boom") })
+	fmt.Printf("  panic 边界恢复: %v\n", recoveredErr)
+
+	// 泛型 Map / Contains
+	fmt.Printf("  泛型 Map 大写: %v\n", advanced.Map([]string{"a", "b", "c"}, strings.ToUpper))
+	fmt.Printf("  泛型 Contains: %v\n", advanced.Contains([]int{1, 2, 3}, 2))
+
+	// 反射类型与 tag
+	fmt.Printf("  反射类型名: %s, Kind: %s\n", advanced.TypeName(user), advanced.KindName(user))
+	tag, _ := advanced.GetTagValue(user, "Name", "validate")
+	fmt.Printf("  反射读取 tag: %s\n", tag)
 }
 
 // demoStdlib 演示 Go 标准库应用
@@ -593,6 +650,44 @@ func demoStdlib() {
 	people := []stdlib.Person{{Name: "Bob", Age: 30}, {Name: "Alice", Age: 25}, {Name: "Carol", Age: 35}}
 	stdlib.SortByAgeAsc(people)
 	fmt.Printf("  按年龄排序: %v\n", people)
+
+	// HTTP POST 请求
+	var echoResp stdlib.Message
+	if err := stdlib.PostJSON(server.URL+"/api/echo", map[string]interface{}{"message": "hello"}, 2*time.Second, &echoResp); err != nil {
+		fmt.Printf("  POST /api/echo 失败: %v\n", err)
+	} else {
+		fmt.Printf("  POST /api/echo: %s\n", echoResp.Msg)
+	}
+
+	// JSON 反序列化
+	roundTrip, _ := stdlib.UnmarshalUser(data)
+	fmt.Printf("  JSON 反序列化: %s\n", roundTrip.Name)
+
+	// 自定义 MarshalJSON（价格分→元）
+	prodStr, _ := stdlib.ToJSON(stdlib.Product{Name: "iPhone", Price: 699900})
+	fmt.Printf("  自定义 JSON（分→元）: %s\n", prodStr)
+
+	// io 单词统计
+	wordCount, _ := stdlib.CountWords("go is awesome go")
+	fmt.Printf("  单词统计: %d\n", wordCount)
+
+	// 防路径穿越
+	safePath, safeErr := stdlib.SafeJoin("/data", "../etc/passwd")
+	fmt.Printf("  防路径穿越: %v (err=%v)\n", safePath, safeErr != nil)
+
+	// regexp 手机号校验与邮箱提取
+	fmt.Printf("  手机号校验: %v\n", stdlib.IsValidPhone("13812345678"))
+	fmt.Printf("  提取邮箱: %v\n", stdlib.ExtractEmails("contact a@b.com or c@d.com"))
+
+	// time 定时器
+	ticks := 0
+	stop := stdlib.RunTicker(10*time.Millisecond, func() { ticks++ })
+	time.Sleep(35 * time.Millisecond)
+	stop()
+	fmt.Printf("  Ticker 触发次数: %d\n", ticks)
+
+	// sort 二分查找
+	fmt.Printf("  二分查找 5: %d\n", stdlib.SearchInt([]int{1, 3, 5, 7, 9}, 5))
 }
 
 // demoThirdparty 演示知名第三方库应用
@@ -628,6 +723,33 @@ func demoThirdparty() {
 	db.Create(&thirdparty.Order{UserID: user.ID, Product: "iPhone", Price: 6999})
 	u, _ := thirdparty.FindUserWithOrders(db, user.ID)
 	fmt.Printf("  gorm 用户 %s 的订单数: %d\n", u.Name, len(u.Orders))
+
+	// gin GET 探活
+	pingRec := httptest.NewRecorder()
+	pingReq := httptest.NewRequest(http.MethodGet, "/ping", nil)
+	router.ServeHTTP(pingRec, pingReq)
+	fmt.Printf("  gin GET /ping: %d %s\n", pingRec.Code, strings.TrimSpace(pingRec.Body.String()))
+
+	// zap 错误日志
+	thirdparty.LogError(logger, errors.New("database timeout"), "query_users")
+
+	// cobra calc 子命令
+	calcRoot := thirdparty.NewRootCmd()
+	calcRoot.SetArgs([]string{"calc", "--a", "10", "--b", "4", "--op", "div"})
+	var calcOut bytes.Buffer
+	calcRoot.SetOut(&calcOut)
+	_ = calcRoot.Execute()
+	fmt.Printf("  cobra calc 输出: %s\n", strings.TrimSpace(calcOut.String()))
+
+	// gorm 条件查询、更新与删除
+	ageUsers, _ := thirdparty.FindUsersByAge(db, 25)
+	fmt.Printf("  gorm 按年龄查询: %d 个用户\n", len(ageUsers))
+	_ = thirdparty.UpdateUserAge(db, user.ID, 26)
+	updated, _ := thirdparty.FindUserByID(db, user.ID)
+	fmt.Printf("  gorm 更新年龄后: %d\n", updated.Age)
+	_ = thirdparty.DeleteUser(db, user.ID)
+	_, findErr := thirdparty.FindUserByID(db, user.ID)
+	fmt.Printf("  gorm 删除后查询是否报错: %v\n", findErr != nil)
 }
 
 // demoCoreAlgo 演示核心算法
@@ -649,4 +771,9 @@ func demoCoreAlgo() {
 	fmt.Printf("  GCD(48,36): %d\n", corealgo.GCD(48, 36))
 	fmt.Printf("  快速幂 2^10 mod 1000: %d\n", corealgo.PowMod(2, 10, 1000))
 	fmt.Printf("  C(5,2): %d\n", corealgo.Combination(5, 2))
+
+	// 贪心找零与子集
+	coins, ok := corealgo.CoinChangeGreedy([]int{1, 5, 10, 25}, 63)
+	fmt.Printf("  贪心找零 63 美分: %d 枚 (ok=%v)\n", coins, ok)
+	fmt.Printf("  子集个数: %d\n", len(corealgo.Subsets([]int{1, 2, 3})))
 }
