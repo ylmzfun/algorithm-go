@@ -35,7 +35,7 @@ func NewTrieNode() *TrieNode {
 // 7. 生物信息学：DNA序列匹配
 type Trie struct {
 	root *TrieNode // 根节点
-	size int        // 存储的单词数量
+	size int       // 存储的单词数量
 }
 
 // NewTrie 创建新的字典树
@@ -57,9 +57,9 @@ func (t *Trie) InsertWithValue(word string, value interface{}) {
 	if word == "" {
 		return
 	}
-	
+
 	current := t.root
-	
+
 	// 遍历单词的每个字符
 	for _, char := range word {
 		// 如果子节点不存在，创建新节点
@@ -69,7 +69,7 @@ func (t *Trie) InsertWithValue(word string, value interface{}) {
 		current = current.children[char]
 		current.count++ // 增加经过此节点的单词计数
 	}
-	
+
 	// 标记单词结尾
 	if !current.isEnd {
 		current.isEnd = true
@@ -99,16 +99,16 @@ func (t *Trie) searchNode(word string) *TrieNode {
 	if word == "" {
 		return t.root
 	}
-	
+
 	current := t.root
-	
+
 	for _, char := range word {
 		if current.children[char] == nil {
 			return nil
 		}
 		current = current.children[char]
 	}
-	
+
 	return current
 }
 
@@ -124,7 +124,7 @@ func (t *Trie) GetWordsWithPrefix(prefix string) []string {
 	if node == nil {
 		return []string{}
 	}
-	
+
 	result := make([]string, 0)
 	t.collectWords(node, prefix, &result)
 	return result
@@ -135,7 +135,7 @@ func (t *Trie) collectWords(node *TrieNode, prefix string, result *[]string) {
 	if node.isEnd {
 		*result = append(*result, prefix)
 	}
-	
+
 	for char, child := range node.children {
 		t.collectWords(child, prefix+string(char), result)
 	}
@@ -147,7 +147,7 @@ func (t *Trie) GetWordsWithPrefixAndValue(prefix string) []WordValue {
 	if node == nil {
 		return []WordValue{}
 	}
-	
+
 	result := make([]WordValue, 0)
 	t.collectWordsWithValue(node, prefix, &result)
 	return result
@@ -167,7 +167,7 @@ func (t *Trie) collectWordsWithValue(node *TrieNode, prefix string, result *[]Wo
 			Value: node.value,
 		})
 	}
-	
+
 	for char, child := range node.children {
 		t.collectWordsWithValue(child, prefix+string(char), result)
 	}
@@ -179,12 +179,12 @@ func (t *Trie) Delete(word string) bool {
 	if word == "" || !t.Search(word) {
 		return false
 	}
-	
-	deleted := t.deleteHelper(t.root, word, 0)
-	if deleted {
-		t.size--
-	}
-	return deleted
+
+	// deleteHelper 的返回值表示"父节点是否需要剪掉该子节点"（剪枝语义），
+	// 并非"删除是否成功"；成功与否已由上面的 Search 判定
+	t.deleteHelper(t.root, word, 0)
+	t.size--
+	return true
 }
 
 // deleteHelper 递归删除单词的辅助函数
@@ -199,25 +199,25 @@ func (t *Trie) deleteHelper(node *TrieNode, word string, index int) bool {
 		// 如果节点没有子节点，可以删除
 		return len(node.children) == 0
 	}
-	
+
 	runes := []rune(word)
 	char := runes[index]
 	child := node.children[char]
-	
+
 	if child == nil {
 		return false // 单词不存在
 	}
-	
+
 	// 递归删除
 	shouldDeleteChild := t.deleteHelper(child, word, index+1)
-	
+
 	if shouldDeleteChild {
 		// 删除子节点
 		delete(node.children, char)
 		// 如果当前节点不是单词结尾且没有其他子节点，也可以删除
 		return !node.isEnd && len(node.children) == 0
 	}
-	
+
 	// 更新计数
 	child.count--
 	return false
@@ -254,10 +254,10 @@ func (t *Trie) GetLongestCommonPrefix() string {
 	if t.IsEmpty() {
 		return ""
 	}
-	
+
 	var prefix strings.Builder
 	current := t.root
-	
+
 	// 当只有一个子节点且不是单词结尾时，继续
 	for len(current.children) == 1 && !current.isEnd {
 		for char, child := range current.children {
@@ -266,7 +266,7 @@ func (t *Trie) GetLongestCommonPrefix() string {
 			break
 		}
 	}
-	
+
 	return prefix.String()
 }
 
@@ -285,11 +285,11 @@ func (t *Trie) countWords(node *TrieNode) int {
 	if node.isEnd {
 		count = 1
 	}
-	
+
 	for _, child := range node.children {
 		count += t.countWords(child)
 	}
-	
+
 	return count
 }
 
@@ -298,20 +298,20 @@ func (t *Trie) GetShortestUniquePrefix(word string) string {
 	if !t.Search(word) {
 		return ""
 	}
-	
+
 	current := t.root
 	var prefix strings.Builder
-	
+
 	for _, char := range word {
 		prefix.WriteRune(char)
 		current = current.children[char]
-		
+
 		// 如果当前节点的计数为1，说明这是唯一路径
 		if current.count == 1 {
 			return prefix.String()
 		}
 	}
-	
+
 	return word // 如果没有找到唯一前缀，返回完整单词
 }
 
@@ -336,23 +336,23 @@ func (t *Trie) fuzzySearchHelper(node *TrieNode, current, target string, distanc
 	if distance > maxDistance {
 		return
 	}
-	
+
 	if node.isEnd && len(current) >= len(target)-maxDistance && len(current) <= len(target)+maxDistance {
 		*result = append(*result, current)
 	}
-	
+
 	targetRunes := []rune(target)
 	currentRunes := []rune(current)
-	
+
 	for char, child := range node.children {
 		newCurrent := current + string(char)
 		newDistance := distance
-		
+
 		// 如果当前字符与目标字符不匹配，增加距离
 		if len(currentRunes) < len(targetRunes) && char != targetRunes[len(currentRunes)] {
 			newDistance++
 		}
-		
+
 		t.fuzzySearchHelper(child, newCurrent, target, newDistance, maxDistance, result)
 	}
 }
@@ -362,7 +362,7 @@ func (t *Trie) String() string {
 	if t.IsEmpty() {
 		return "Trie{}"
 	}
-	
+
 	words := t.GetAllWords()
 	return "Trie{words: [" + strings.Join(words, ", ") + "]}"
 }
@@ -379,7 +379,7 @@ func (t *Trie) printTrieHelper(node *TrieNode, prefix, indent string) {
 	} else if prefix != "" {
 		println(indent + prefix)
 	}
-	
+
 	for char, child := range node.children {
 		t.printTrieHelper(child, string(char), indent+"  ")
 	}
@@ -423,24 +423,24 @@ func (ct *CompressedTrie) Insert(word string) {
 	if word == "" {
 		return
 	}
-	
+
 	current := ct.root
 	i := 0
 	runes := []rune(word)
-	
+
 	for i < len(runes) {
 		char := runes[i]
-		
+
 		if child, exists := current.children[char]; exists {
 			// 找到匹配的子节点
 			labelRunes := []rune(child.label)
 			j := 0
-			
+
 			// 比较标签和剩余单词
 			for j < len(labelRunes) && i+j < len(runes) && labelRunes[j] == runes[i+j] {
 				j++
 			}
-			
+
 			if j == len(labelRunes) {
 				// 完全匹配标签
 				current = child
@@ -463,7 +463,7 @@ func (ct *CompressedTrie) Insert(word string) {
 			return
 		}
 	}
-	
+
 	// 标记单词结尾
 	if !current.isEnd {
 		current.isEnd = true
@@ -474,7 +474,7 @@ func (ct *CompressedTrie) Insert(word string) {
 // splitNode 分割压缩字典树节点
 func (ct *CompressedTrie) splitNode(node *CompressedTrieNode, splitIndex int) {
 	labelRunes := []rune(node.label)
-	
+
 	// 创建新的子节点
 	newChild := &CompressedTrieNode{
 		children: node.children,
@@ -482,7 +482,7 @@ func (ct *CompressedTrie) splitNode(node *CompressedTrieNode, splitIndex int) {
 		isEnd:    node.isEnd,
 		value:    node.value,
 	}
-	
+
 	// 更新当前节点
 	node.children = make(map[rune]*CompressedTrieNode)
 	node.children[labelRunes[splitIndex]] = newChild
@@ -502,35 +502,35 @@ func (ct *CompressedTrie) searchNode(word string) *CompressedTrieNode {
 	if word == "" {
 		return ct.root
 	}
-	
+
 	current := ct.root
 	runes := []rune(word)
 	i := 0
-	
+
 	for i < len(runes) {
 		char := runes[i]
-		
+
 		if child, exists := current.children[char]; exists {
 			labelRunes := []rune(child.label)
-			
+
 			// 检查标签是否匹配
 			if i+len(labelRunes) > len(runes) {
 				return nil // 剩余字符不足
 			}
-			
+
 			for j, labelChar := range labelRunes {
 				if runes[i+j] != labelChar {
 					return nil // 不匹配
 				}
 			}
-			
+
 			current = child
 			i += len(labelRunes)
 		} else {
 			return nil // 没有匹配的子节点
 		}
 	}
-	
+
 	return current
 }
 

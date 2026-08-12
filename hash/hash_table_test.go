@@ -375,27 +375,35 @@ func TestOpenAddressingResize(t *testing.T) {
 
 // TestHashCollision 测试哈希冲突处理
 func TestHashCollision(t *testing.T) {
-	ht := NewHashTable(2, 0.75) // 小容量，容易产生冲突
+	ht := NewHashTable(2, 0.75) // 小容量起步，插入过程会自动扩容
 
-	// 插入多个元素，必然产生冲突
-	for i := 0; i < 10; i++ {
-		key := fmt.Sprintf("key%d", i)
-		ht.Put(key, i)
+	// 持续插入直到发生哈希冲突：FNV-32a 分布均匀，冲突虽不保证出现在
+	// 前几个键中，但循环探测能保证测试确定性（一般几十个键内即出现冲突）
+	const maxKeys = 10000
+	i := 0
+	for ; i < maxKeys; i++ {
+		ht.Put(fmt.Sprintf("key%d", i), i)
+		if ht.GetMaxChainLength() > 1 {
+			break
+		}
+	}
+	if i >= maxKeys {
+		t.Fatalf("插入 %d 个键仍未发生冲突", maxKeys)
 	}
 
-	// 验证所有元素都能正确获取
-	for i := 0; i < 10; i++ {
-		key := fmt.Sprintf("key%d", i)
+	// 验证已插入的所有元素都能正确获取
+	for j := 0; j <= i; j++ {
+		key := fmt.Sprintf("key%d", j)
 		value, err := ht.Get(key)
 		if err != nil {
 			t.Errorf("Key %s not found", key)
 		}
-		if value != i {
-			t.Errorf("Expected %d, got %v for key %s", i, value, key)
+		if value != j {
+			t.Errorf("Expected %d, got %v for key %s", j, value, key)
 		}
 	}
 
-	// 验证链表长度
+	// 验证链表长度（已发生冲突，链长必然 > 1）
 	maxChainLength := ht.GetMaxChainLength()
 	if maxChainLength <= 1 {
 		t.Errorf("Expected chain length > 1 due to collisions, got %d", maxChainLength)

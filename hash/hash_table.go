@@ -19,10 +19,10 @@ import (
 // 6. 分布式系统：一致性哈希，负载均衡
 // 7. 搜索引擎：倒排索引的实现
 type HashTable struct {
-	buckets  []*HashNode // 桶数组，每个桶是一个链表的头节点
-	size     int         // 当前存储的键值对数量
-	capacity int         // 桶的数量
-	loadFactor float64  // 负载因子阈值
+	buckets    []*HashNode // 桶数组，每个桶是一个链表的头节点
+	size       int         // 当前存储的键值对数量
+	capacity   int         // 桶的数量
+	loadFactor float64     // 负载因子阈值
 }
 
 // HashNode 哈希表节点（链表节点）
@@ -42,7 +42,7 @@ func NewHashTable(initialCapacity int, loadFactor float64) *HashTable {
 	if loadFactor <= 0 || loadFactor > 1 {
 		loadFactor = 0.75
 	}
-	
+
 	return &HashTable{
 		buckets:    make([]*HashNode, initialCapacity),
 		size:       0,
@@ -70,10 +70,10 @@ func (ht *HashTable) Put(key string, value interface{}) {
 	if float64(ht.size) >= float64(ht.capacity)*ht.loadFactor {
 		ht.resize()
 	}
-	
+
 	index := ht.hash(key)
 	head := ht.buckets[index]
-	
+
 	// 如果桶为空，直接插入
 	if head == nil {
 		ht.buckets[index] = &HashNode{
@@ -84,7 +84,7 @@ func (ht *HashTable) Put(key string, value interface{}) {
 		ht.size++
 		return
 	}
-	
+
 	// 遍历链表，查找是否已存在该键
 	current := head
 	for current != nil {
@@ -95,7 +95,7 @@ func (ht *HashTable) Put(key string, value interface{}) {
 		}
 		current = current.Next
 	}
-	
+
 	// 键不存在，在链表头部插入新节点
 	newNode := &HashNode{
 		Key:   key,
@@ -111,7 +111,7 @@ func (ht *HashTable) Put(key string, value interface{}) {
 func (ht *HashTable) Get(key string) (interface{}, error) {
 	index := ht.hash(key)
 	current := ht.buckets[index]
-	
+
 	// 遍历链表查找键
 	for current != nil {
 		if current.Key == key {
@@ -119,7 +119,7 @@ func (ht *HashTable) Get(key string) (interface{}, error) {
 		}
 		current = current.Next
 	}
-	
+
 	return nil, errors.New("key not found")
 }
 
@@ -135,18 +135,18 @@ func (ht *HashTable) Contains(key string) bool {
 func (ht *HashTable) Remove(key string) (interface{}, error) {
 	index := ht.hash(key)
 	head := ht.buckets[index]
-	
+
 	if head == nil {
 		return nil, errors.New("key not found")
 	}
-	
+
 	// 如果要删除的是头节点
 	if head.Key == key {
 		ht.buckets[index] = head.Next
 		ht.size--
 		return head.Value, nil
 	}
-	
+
 	// 遍历链表查找要删除的节点
 	current := head
 	for current.Next != nil {
@@ -158,7 +158,7 @@ func (ht *HashTable) Remove(key string) (interface{}, error) {
 		}
 		current = current.Next
 	}
-	
+
 	return nil, errors.New("key not found")
 }
 
@@ -186,7 +186,7 @@ func (ht *HashTable) LoadFactor() float64 {
 // 时间复杂度：O(n)
 func (ht *HashTable) Keys() []string {
 	keys := make([]string, 0, ht.size)
-	
+
 	for i := 0; i < ht.capacity; i++ {
 		current := ht.buckets[i]
 		for current != nil {
@@ -194,7 +194,7 @@ func (ht *HashTable) Keys() []string {
 			current = current.Next
 		}
 	}
-	
+
 	return keys
 }
 
@@ -202,7 +202,7 @@ func (ht *HashTable) Keys() []string {
 // 时间复杂度：O(n)
 func (ht *HashTable) Values() []interface{} {
 	values := make([]interface{}, 0, ht.size)
-	
+
 	for i := 0; i < ht.capacity; i++ {
 		current := ht.buckets[i]
 		for current != nil {
@@ -210,7 +210,7 @@ func (ht *HashTable) Values() []interface{} {
 			current = current.Next
 		}
 	}
-	
+
 	return values
 }
 
@@ -218,7 +218,7 @@ func (ht *HashTable) Values() []interface{} {
 // 时间复杂度：O(n)
 func (ht *HashTable) Entries() []Entry {
 	entries := make([]Entry, 0, ht.size)
-	
+
 	for i := 0; i < ht.capacity; i++ {
 		current := ht.buckets[i]
 		for current != nil {
@@ -229,7 +229,7 @@ func (ht *HashTable) Entries() []Entry {
 			current = current.Next
 		}
 	}
-	
+
 	return entries
 }
 
@@ -251,12 +251,12 @@ func (ht *HashTable) Clear() {
 func (ht *HashTable) resize() {
 	oldBuckets := ht.buckets
 	oldCapacity := ht.capacity
-	
+
 	// 创建新的桶数组
 	ht.capacity *= 2
 	ht.buckets = make([]*HashNode, ht.capacity)
 	ht.size = 0
-	
+
 	// 重新插入所有元素
 	for i := 0; i < oldCapacity; i++ {
 		current := oldBuckets[i]
@@ -270,7 +270,7 @@ func (ht *HashTable) resize() {
 // GetBucketDistribution 获取桶的分布情况（用于分析哈希函数性能）
 func (ht *HashTable) GetBucketDistribution() []int {
 	distribution := make([]int, ht.capacity)
-	
+
 	for i := 0; i < ht.capacity; i++ {
 		count := 0
 		current := ht.buckets[i]
@@ -280,14 +280,14 @@ func (ht *HashTable) GetBucketDistribution() []int {
 		}
 		distribution[i] = count
 	}
-	
+
 	return distribution
 }
 
 // GetMaxChainLength 获取最长链表的长度
 func (ht *HashTable) GetMaxChainLength() int {
 	maxLength := 0
-	
+
 	for i := 0; i < ht.capacity; i++ {
 		length := 0
 		current := ht.buckets[i]
@@ -299,7 +299,7 @@ func (ht *HashTable) GetMaxChainLength() int {
 			maxLength = length
 		}
 	}
-	
+
 	return maxLength
 }
 
@@ -308,7 +308,7 @@ func (ht *HashTable) String() string {
 	if ht.IsEmpty() {
 		return "HashTable{}"
 	}
-	
+
 	var elements []string
 	for i := 0; i < ht.capacity; i++ {
 		current := ht.buckets[i]
@@ -317,8 +317,8 @@ func (ht *HashTable) String() string {
 			current = current.Next
 		}
 	}
-	
-	return fmt.Sprintf("HashTable{size: %d, capacity: %d, loadFactor: %.2f, elements: {%s}}", 
+
+	return fmt.Sprintf("HashTable{size: %d, capacity: %d, loadFactor: %.2f, elements: {%s}}",
 		ht.size, ht.capacity, ht.LoadFactor(), strings.Join(elements, ", "))
 }
 
@@ -326,12 +326,12 @@ func (ht *HashTable) String() string {
 // 优点：内存使用更紧凑，缓存友好
 // 缺点：删除操作复杂，负载因子不能太高
 type HashTableWithOpenAddressing struct {
-	keys     []string      // 键数组
-	values   []interface{} // 值数组
-	deleted  []bool        // 删除标记数组
-	size     int           // 当前大小
-	capacity int           // 容量
-	loadFactor float64    // 负载因子阈值
+	keys       []string      // 键数组
+	values     []interface{} // 值数组
+	deleted    []bool        // 删除标记数组
+	size       int           // 当前大小
+	capacity   int           // 容量
+	loadFactor float64       // 负载因子阈值
 }
 
 // NewHashTableWithOpenAddressing 创建开放地址法哈希表
@@ -342,7 +342,7 @@ func NewHashTableWithOpenAddressing(initialCapacity int, loadFactor float64) *Ha
 	if loadFactor <= 0 || loadFactor > 0.5 { // 开放地址法负载因子不宜过高
 		loadFactor = 0.5
 	}
-	
+
 	return &HashTableWithOpenAddressing{
 		keys:       make([]string, initialCapacity),
 		values:     make([]interface{}, initialCapacity),
@@ -366,9 +366,9 @@ func (ht *HashTableWithOpenAddressing) Put(key string, value interface{}) {
 	if float64(ht.size) >= float64(ht.capacity)*ht.loadFactor {
 		ht.resize()
 	}
-	
+
 	index := ht.hash(key)
-	
+
 	// 线性探测找到空位或相同键
 	for {
 		if ht.keys[index] == "" || ht.deleted[index] {
@@ -388,7 +388,7 @@ func (ht *HashTableWithOpenAddressing) Put(key string, value interface{}) {
 			ht.values[index] = value
 			return
 		}
-		
+
 		// 继续探测下一个位置
 		index = (index + 1) % ht.capacity
 	}
@@ -397,37 +397,37 @@ func (ht *HashTableWithOpenAddressing) Put(key string, value interface{}) {
 // Get 获取指定键的值
 func (ht *HashTableWithOpenAddressing) Get(key string) (interface{}, error) {
 	index := ht.hash(key)
-	
+
 	// 线性探测查找键
 	for i := 0; i < ht.capacity; i++ {
 		currentIndex := (index + i) % ht.capacity
-		
+
 		if ht.keys[currentIndex] == "" && !ht.deleted[currentIndex] {
 			// 遇到真正的空位，键不存在
 			break
 		}
-		
+
 		if ht.keys[currentIndex] == key && !ht.deleted[currentIndex] {
 			return ht.values[currentIndex], nil
 		}
 	}
-	
+
 	return nil, errors.New("key not found")
 }
 
 // Remove 删除指定键（懒删除）
 func (ht *HashTableWithOpenAddressing) Remove(key string) (interface{}, error) {
 	index := ht.hash(key)
-	
+
 	// 线性探测查找键
 	for i := 0; i < ht.capacity; i++ {
 		currentIndex := (index + i) % ht.capacity
-		
+
 		if ht.keys[currentIndex] == "" && !ht.deleted[currentIndex] {
 			// 遇到真正的空位，键不存在
 			break
 		}
-		
+
 		if ht.keys[currentIndex] == key && !ht.deleted[currentIndex] {
 			// 找到键，标记为删除
 			value := ht.values[currentIndex]
@@ -436,7 +436,7 @@ func (ht *HashTableWithOpenAddressing) Remove(key string) (interface{}, error) {
 			return value, nil
 		}
 	}
-	
+
 	return nil, errors.New("key not found")
 }
 
@@ -456,14 +456,14 @@ func (ht *HashTableWithOpenAddressing) resize() {
 	oldValues := ht.values
 	oldDeleted := ht.deleted
 	oldCapacity := ht.capacity
-	
+
 	// 创建新数组
 	ht.capacity *= 2
 	ht.keys = make([]string, ht.capacity)
 	ht.values = make([]interface{}, ht.capacity)
 	ht.deleted = make([]bool, ht.capacity)
 	ht.size = 0
-	
+
 	// 重新插入所有有效元素
 	for i := 0; i < oldCapacity; i++ {
 		if oldKeys[i] != "" && !oldDeleted[i] {
