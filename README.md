@@ -29,7 +29,11 @@ go-algorithm/
 ├── unionfind/      # 并查集
 ├── bloomfilter/    # 布隆过滤器
 ├── sort/           # 排序算法
-└── search/         # 搜索算法
+├── search/         # 搜索算法
+├── advanced/       # Go 语言高级用法（并发、channel、sync、context、泛型、反射等）
+├── stdlib/         # Go 标准库应用（net/http、encoding/json、io、regexp、time 等）
+├── thirdparty/     # Go 知名第三方库应用（gin、zap、cobra、viper、gorm 等）
+└── corealgo/       # Go 核心算法（动态规划、贪心、回溯、分治、字符串算法、数论）
 ```
 
 ## 已实现的数据结构与算法
@@ -94,6 +98,40 @@ go-algorithm/
 - [x] 第 K 大元素 (`heap.FindKthLargest`)
 - [x] 数组反转 (`sort.Reverse`)
 - [x] 排序校验 (`sort.IsSorted`)
+
+### Go 语言高级用法 (advanced)
+- [x] goroutine 并发编排 — WaitGroup 并发求和、并行转换 (`advanced.ConcurrentSum` / `advanced.ParallelMap`)
+- [x] channel 通信 — 生产者-消费者、有缓冲/无缓冲、close 与 range (`advanced.Produce` / `advanced.ConsumeAll`)
+- [x] select 多路复用 — 竞争接收、超时控制、非阻塞尝试 (`advanced.SelectWithTimeout` / `advanced.SelectLoop`)
+- [x] sync 并发原语 — Mutex/RWMutex、sync.Once 单例、sync.Pool 对象池 (`advanced.NewCounter` / `advanced.GetInstance`)
+- [x] context 上下文 — 取消传播、超时控制、值传递 (`advanced.RunWithTimeout` / `advanced.ProcessItems`)
+- [x] defer/panic/recover — 执行顺序、panic 转 error、通用恢复 (`advanced.DeferOrder` / `advanced.SafeDivide`)
+- [x] 泛型 — 类型约束、泛型容器 (`advanced.Max` / `advanced.Stack[T]`)
+- [x] 反射 — 字段遍历、struct tag、动态调用 (`advanced.FieldValues` / `advanced.CallMethod`)
+
+### Go 标准库应用 (stdlib)
+- [x] net/http — 路由、JSON 接口、HTTP 客户端 (`stdlib.NewMux` / `stdlib.GetJSON`)
+- [x] encoding/json — 序列化、字段 tag、自定义编解码 (`stdlib.MarshalUser` / `stdlib.ToJSON`)
+- [x] io/bufio — 按行读取、缓冲写入 (`stdlib.NewLineReader` / `stdlib.WriteLines`)
+- [x] os/path/filepath — 文件读写、目录遍历、防路径穿越 (`stdlib.WriteFileContent` / `stdlib.ListFiles`)
+- [x] regexp — 邮箱/手机号校验、脱敏、分组提取 (`stdlib.IsValidEmail` / `stdlib.MaskPhone`)
+- [x] time — 格式化、解析、定时器、年龄计算 (`stdlib.FormatRFC3339` / `stdlib.RunTicker`)
+- [x] sort/slices — 自定义排序、二分查找 (`stdlib.SortByAgeAsc` / `stdlib.SearchInt`)
+
+### Go 知名第三方库应用 (thirdparty)
+- [x] gin — HTTP 框架：路由、参数绑定、中间件 (`thirdparty.SetupRouter`)
+- [x] zap — 结构化日志 (`thirdparty.NewDevelopmentLogger` / `thirdparty.LogUserAction`)
+- [x] cobra — CLI 框架：子命令、flag 解析 (`thirdparty.NewRootCmd`)
+- [x] viper — 配置管理：YAML 解析、默认值、Unmarshal (`thirdparty.LoadConfigFromYAML`)
+- [x] gorm — ORM：内存 SQLite、CRUD、预加载关联 (`thirdparty.OpenSQLiteMemory` / `thirdparty.FindUserWithOrders`)
+
+### Go 核心算法 (corealgo)
+- [x] 动态规划 — 斐波那契、0-1 背包、LCS、LIS (`corealgo.Fibonacci` / `corealgo.Knapsack01`)
+- [x] 贪心 — 活动选择、跳跃游戏 (`corealgo.ActivitySelection` / `corealgo.MinJump`)
+- [x] 回溯 — N 皇后、全排列、子集 (`corealgo.SolveNQueens` / `corealgo.Permute`)
+- [x] 分治 — 最大子数组和、逆序对 (`corealgo.MaxSubArrayDivide` / `corealgo.CountInversions`)
+- [x] 字符串算法 — KMP、Rabin-Karp (`corealgo.KMPSearch` / `corealgo.RabinKarpSearch`)
+- [x] 数论 — 素数筛、GCD、快速幂、组合数 (`corealgo.SieveOfEratosthenes` / `corealgo.PowMod`)
 
 ## 使用方法
 

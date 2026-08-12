@@ -1,9 +1,18 @@
 package main
 
 import (
+	"bytes"
+	"context"
 	"fmt"
+	"net/http"
+	"net/http/httptest"
+	"os"
+	"strings"
+	"time"
 
+	"algorithm-go/advanced"
 	"algorithm-go/bloomfilter"
+	"algorithm-go/corealgo"
 	"algorithm-go/graph"
 	"algorithm-go/hash"
 	"algorithm-go/heap"
@@ -12,6 +21,8 @@ import (
 	"algorithm-go/search"
 	"algorithm-go/sort"
 	"algorithm-go/stack"
+	"algorithm-go/stdlib"
+	"algorithm-go/thirdparty"
 	"algorithm-go/tree"
 	"algorithm-go/trie"
 	"algorithm-go/unionfind"
@@ -100,6 +111,26 @@ func main() {
 	// 16. 搜索算法演示
 	fmt.Println("16. 搜索算法 (Search)")
 	demoSearch()
+	fmt.Println()
+
+	// 17. Go 高级用法演示
+	fmt.Println("17. Go 高级用法 (Advanced)")
+	demoAdvanced()
+	fmt.Println()
+
+	// 18. 标准库应用演示
+	fmt.Println("18. Go 标准库应用 (Stdlib)")
+	demoStdlib()
+	fmt.Println()
+
+	// 19. 知名第三方库应用演示
+	fmt.Println("19. Go 知名第三方库应用 (Thirdparty)")
+	demoThirdparty()
+	fmt.Println()
+
+	// 20. 核心算法演示
+	fmt.Println("20. Go 核心算法 (CoreAlgo)")
+	demoCoreAlgo()
 	fmt.Println()
 
 	fmt.Println("=== 演示完成 ===")
@@ -454,4 +485,168 @@ func demoSearch() {
 	// LowerBound / UpperBound
 	fmt.Printf("  LowerBound(8): %d\n", search.LowerBound(arr, 8))
 	fmt.Printf("  UpperBound(8): %d\n", search.UpperBound(arr, 8))
+}
+
+// demoAdvanced 演示 Go 高级用法
+func demoAdvanced() {
+	// goroutine + WaitGroup 并发求和
+	nums := make([]int, 100)
+	for i := range nums {
+		nums[i] = i + 1
+	}
+	fmt.Printf("  并发求和 1..100: %d\n", advanced.ConcurrentSum(nums, 4))
+
+	// channel 生产者-消费者
+	ch := advanced.Produce([]int{1, 2, 3, 4, 5})
+	fmt.Printf("  生产者-消费者: %v\n", advanced.ConsumeAll(ch))
+
+	// select 超时控制
+	_, err := advanced.SelectWithTimeout(make(chan int), time.After(10*time.Millisecond))
+	fmt.Printf("  select 超时返回: %v\n", err)
+
+	// sync.Mutex 计数器
+	counter := advanced.NewCounter()
+	for i := 0; i < 10; i++ {
+		counter.Inc()
+	}
+	fmt.Printf("  互斥锁计数器: %d\n", counter.Value())
+
+	// context 超时控制
+	results, timedOut := advanced.RunWithTimeout(20*time.Millisecond, func(ctx context.Context) []string {
+		return advanced.ProcessItems(ctx, []string{"a", "b", "c"})
+	})
+	fmt.Printf("  context 超时: timedOut=%v, 已处理=%v\n", timedOut, results)
+
+	// defer 执行顺序 + panic 恢复
+	fmt.Printf("  defer 执行顺序: %v\n", advanced.DeferOrder())
+	res, err := advanced.SafeDivide(10, 0)
+	fmt.Printf("  panic 转 error: result=%d, err=%v\n", res, err)
+
+	// 泛型
+	fmt.Printf("  泛型 Max(3,7)=%d, Min(1.5,2.5)=%.1f\n", advanced.Max(3, 7), advanced.Min(1.5, 2.5))
+	evens := advanced.Filter([]int{1, 2, 3, 4, 5, 6}, func(n int) bool { return n%2 == 0 })
+	fmt.Printf("  泛型 Filter 偶数: %v\n", evens)
+	stack := advanced.NewStack[int]()
+	stack.Push(1)
+	stack.Push(2)
+	top, _ := stack.Pop()
+	fmt.Printf("  泛型 Stack 出栈: %d, 剩余大小: %d\n", top, stack.Size())
+
+	// 反射
+	user := advanced.User{Name: "Alice", Age: 30}
+	fields, _ := advanced.FieldValues(user)
+	fmt.Printf("  反射字段个数: %d\n", len(fields))
+	calc := advanced.NewCalculator(10)
+	callResults, _ := advanced.CallMethod(calc, "Add", 5)
+	fmt.Printf("  反射调用 Calculator.Add(5): %v\n", callResults[0])
+}
+
+// demoStdlib 演示 Go 标准库应用
+func demoStdlib() {
+	// net/http：本地内存起服务再请求
+	mux := stdlib.NewMux()
+	server := httptest.NewServer(mux)
+	defer server.Close()
+
+	var msg stdlib.Message
+	if err := stdlib.GetJSON(server.URL+"/api/hello", 2*time.Second, &msg); err != nil {
+		fmt.Printf("  HTTP GET 失败: %v\n", err)
+	} else {
+		fmt.Printf("  GET /api/hello: %s\n", msg.Msg)
+	}
+
+	// encoding/json 序列化与反序列化
+	u := stdlib.User{ID: 1, Name: "Alice", Age: 25, CreatedAt: time.Now()}
+	data, _ := stdlib.MarshalUser(u)
+	fmt.Printf("  JSON 序列化: %s\n", data)
+
+	// io/bufio 按行读取
+	var buf bytes.Buffer
+	_ = stdlib.WriteLines(&buf, []string{"line1", "line2", "line3"})
+	lr := stdlib.NewLineReader(strings.NewReader(buf.String()))
+	var lines []string
+	for {
+		line, ok := lr.Next()
+		if !ok {
+			break
+		}
+		lines = append(lines, line)
+	}
+	fmt.Printf("  bufio 按行读取: %v\n", lines)
+
+	// os 文件读写
+	path := stdlib.JoinPath(os.TempDir(), "algorithm-go-demo.txt")
+	if err := stdlib.WriteFileContent(path, "hello stdlib"); err == nil {
+		content, _ := stdlib.ReadFileContent(path)
+		fmt.Printf("  文件写入与读取: %s\n", content)
+	}
+
+	// regexp 校验与脱敏
+	fmt.Printf("  邮箱校验 a@b.com: %v\n", stdlib.IsValidEmail("a@b.com"))
+	fmt.Printf("  手机号脱敏: %s\n", stdlib.MaskPhone("13812345678"))
+
+	// time 格式化与年龄计算
+	fmt.Printf("  时间格式化: %s\n", stdlib.FormatRFC3339(time.Now()))
+	fmt.Printf("  年龄计算: %d\n", stdlib.CalculateAge(time.Date(1995, 5, 20, 0, 0, 0, 0, time.UTC), time.Now()))
+
+	// sort 自定义排序
+	people := []stdlib.Person{{Name: "Bob", Age: 30}, {Name: "Alice", Age: 25}, {Name: "Carol", Age: 35}}
+	stdlib.SortByAgeAsc(people)
+	fmt.Printf("  按年龄排序: %v\n", people)
+}
+
+// demoThirdparty 演示知名第三方库应用
+func demoThirdparty() {
+	// gin：内存路由 + httptest 请求
+	router := thirdparty.SetupRouter()
+	rec := httptest.NewRecorder()
+	req := httptest.NewRequest(http.MethodPost, "/api/v1/users", strings.NewReader(`{"name":"Alice","age":25}`))
+	req.Header.Set("Content-Type", "application/json")
+	router.ServeHTTP(rec, req)
+	fmt.Printf("  gin POST /api/v1/users: %d %s\n", rec.Code, strings.TrimSpace(rec.Body.String()))
+
+	// zap：结构化日志
+	logger, _ := thirdparty.NewDevelopmentLogger()
+	thirdparty.LogUserAction(logger, "login", 1001, true)
+
+	// cobra：CLI 命令
+	root := thirdparty.NewRootCmd()
+	root.SetArgs([]string{"greet", "--name", "Go", "--times", "2"})
+	var out bytes.Buffer
+	root.SetOut(&out)
+	_ = root.Execute()
+	fmt.Printf("  cobra greet 输出: %s\n", strings.TrimSpace(out.String()))
+
+	// viper：配置解析
+	cfg, _ := thirdparty.LoadConfigFromYAML("host: 0.0.0.0\nport: 9090\ndatabase:\n  driver: mysql\n  dsn: root:123@tcp(127.0.0.1:3306)/app\n  max_open_conns: 10\n")
+	fmt.Printf("  viper 配置端口: %d, 数据库驱动: %s\n", cfg.Port, cfg.Database.Driver)
+
+	// gorm：内存数据库 CRUD
+	db, _ := thirdparty.OpenSQLiteMemory()
+	user := &thirdparty.User{Name: "Alice", Age: 25, Email: "alice@example.com"}
+	_ = thirdparty.CreateUser(db, user)
+	db.Create(&thirdparty.Order{UserID: user.ID, Product: "iPhone", Price: 6999})
+	u, _ := thirdparty.FindUserWithOrders(db, user.ID)
+	fmt.Printf("  gorm 用户 %s 的订单数: %d\n", u.Name, len(u.Orders))
+}
+
+// demoCoreAlgo 演示核心算法
+func demoCoreAlgo() {
+	fmt.Printf("  斐波那契(10): %d\n", corealgo.Fibonacci(10))
+	fmt.Printf("  0-1背包(容量10): %d\n", corealgo.Knapsack01([]int{2, 3, 4, 5}, []int{3, 4, 5, 6}, 10))
+	fmt.Printf("  LCS('abcde','ace'): %d\n", corealgo.LCSCount("abcde", "ace"))
+	fmt.Printf("  LIS([10,9,2,5,3,7,101,18]): %d\n", corealgo.LISLength([]int{10, 9, 2, 5, 3, 7, 101, 18}))
+	fmt.Printf("  活动选择: %v\n", corealgo.ActivitySelection([]int{1, 3, 0, 5, 3, 5, 6, 8, 8, 2, 12}, []int{4, 5, 6, 7, 9, 9, 10, 11, 12, 14, 16}))
+	fmt.Printf("  跳跃游戏: 可达=%v, 最少跳=%d\n", corealgo.CanJump([]int{2, 3, 1, 1, 4}), corealgo.MinJump([]int{2, 3, 1, 1, 4}))
+	queens := corealgo.SolveNQueens(4)
+	fmt.Printf("  N皇后(4)解数: %d\n", len(queens))
+	fmt.Printf("  全排列 [1,2,3]: %v\n", corealgo.Permute([]int{1, 2, 3}))
+	fmt.Printf("  最大子数组和: %d\n", corealgo.MaxSubArrayDivide([]int{-2, 1, -3, 4, -1, 2, 1, -5, 4}))
+	fmt.Printf("  逆序对数量: %d\n", corealgo.CountInversions([]int{5, 3, 2, 4, 1}))
+	fmt.Printf("  KMP 匹配位置: %v\n", corealgo.KMPSearch("ababcabcabababd", "ababd"))
+	fmt.Printf("  Rabin-Karp 匹配位置: %v\n", corealgo.RabinKarpSearch("ababcabcabababd", "ababd"))
+	fmt.Printf("  素数筛(30): %v\n", corealgo.SieveOfEratosthenes(30))
+	fmt.Printf("  GCD(48,36): %d\n", corealgo.GCD(48, 36))
+	fmt.Printf("  快速幂 2^10 mod 1000: %d\n", corealgo.PowMod(2, 10, 1000))
+	fmt.Printf("  C(5,2): %d\n", corealgo.Combination(5, 2))
 }
